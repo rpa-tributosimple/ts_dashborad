@@ -1,0 +1,30 @@
+#[theme]
+#primaryColor="#F63366"
+#backgroundColor="#191e24"
+#secondaryBackgroundColor="black"
+#textColor="#FFFFFF"
+#font="sans serif"
+
+
+#[theme]
+#primaryColor="#d33682"
+#backgroundColor="#002b36"
+#secondaryBackgroundColor="#586e75"
+#textColor="#fafafa"
+#font="sans serif"
+
+
+#[theme]
+#primaryColor="#d33682"
+#backgroundColor="#002b36"
+#secondaryBackgroundColor="#586e75"
+#textColor="#fafafa"
+#font="sans serif"
+
+
+[theme]
+primaryColor="#6aa5d1"  # Azul suave para el color primario
+backgroundColor="#f0f8ff"  # Blanco azulado para el fondo
+secondaryBackgroundColor="#a6c8e6"  # Azul muy suave para el fondo secundario
+textColor="#003d73"  # Azul oscuro para el texto (para contrastar con el fondo claro)
+font="sans serif"
