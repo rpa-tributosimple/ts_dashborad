@@ -91,3 +91,49 @@ async def in_queue_tasks(db: db_dependency):
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="ERROR AL BUSCAR DATOS"
         )
+
+
+
+@app.get("/get_task")
+async def get_task_by_id(db: db_dependency, id: str):
+    try:
+        # Lista de modelos y nombres correspondientes
+        job_models = [
+            ("count_afip", JobAfip),
+            ("afccma", JobAfccma),
+            ("afsales", JobAfsales),
+            ("afddjj", JobAfddjj),
+            ("afpurch", JobAfpurchases),
+            ("afconst", JobAfconst),
+            ("agip", JobAgip),
+            ("arba", JobArba),
+        ]
+
+        # Diccionario para almacenar los conteos individuales
+        tareas = {}
+        total_count = 0
+
+        # Realiza la consulta y cuenta para cada modelo
+        for name, model in job_models:
+            job = db.query(model).filter(model.msg_id == id).first()
+
+            if job is not None:
+                count = db.query(model).filter(model.state == JOBS_STATE.FINISHED).count()
+                posicion = job.id - count
+
+                if job.state == 0:
+                    return {
+                        "msg": "RELAJATE Y PEINATE TODAVIA FALTAN TAREAS!!!",
+                        "Pendind": posicion
+                    }
+                else:
+                    return {
+                        "Task": job
+                    }
+
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="ERROR AL BUSCAR DATOS"
+        )
