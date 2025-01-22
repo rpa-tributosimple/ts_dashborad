@@ -1,10 +1,84 @@
-from fastapi import FastAPI, Depends, HTTPException, status
+import logging
+from fastapi import FastAPI, Depends, HTTPException, status, Query, Request
 from models.models import (JobAfip, JobAfccma, JobAfsales, JobAfddjj,
                            JobAfpurchases, JobAfconst, JobAgip, JobArba)
 from db.db import db_dependency
 from util.constants import JOBS_STATE
+import traceback
+from logging_config import setup_logging
+from fastapi.responses import HTMLResponse
+from fastapi.templating import Jinja2Templates
+import pandas as pd
+
+
+setup_logging()
+
 
 app = FastAPI()
+
+
+log_prod = logging.getLogger("Dash")
+
+# Configura el directorio de plantillas
+templates = Jinja2Templates(directory="templates")
+
+
+@app.get("/", response_class = HTMLResponse)
+async def home(db: db_dependency, request: Request):
+    try:
+        # Lista de modelos y nombres correspondientes
+        job_models = [
+            ("afip", JobAfip),
+            ("afccma", JobAfccma),
+            ("afsales", JobAfsales),
+            ("afddjj", JobAfddjj),
+            ("afpurch", JobAfpurchases),
+            ("afconst", JobAfconst),
+            ("agip", JobAgip),
+            ("arba", JobArba),
+        ]
+
+        # Diccionario para almacenar los conteos individuales
+        tareas = {}
+        tareas_queue = {}
+        total_count = 0
+        total_count_queues = 0
+
+        # Realiza la consulta y cuenta para cada modelo
+        for name, model in job_models:
+            count = db.query(model).filter(model.state == JOBS_STATE.FINISHED).count()
+            tareas[name] = count
+            total_count += count  # Acumula el conteo total
+
+        tareas["totals"] = total_count
+
+        tareas_df = pd.DataFrame([tareas])
+
+        for name, model in job_models:
+            count_queues = db.query(model).filter(model.state == JOBS_STATE.PENDING).count()
+            tareas_queue[name] = count_queues
+            total_count_queues += count_queues  # Acumula el conteo total
+
+        tareas_queue["totals"] = total_count_queues
+
+        tareas_queue_df = pd.DataFrame([tareas_queue])
+
+
+        return templates.TemplateResponse("dashboard.html", { "request": request,
+                                                              "columns": tareas_df.columns,
+                                                              "rows": tareas_df.to_dict(orient="records"),
+                                                              "columns1": tareas_queue_df.columns,
+                                                              "rows1": tareas_queue_df.to_dict(orient="records")
+
+                                                              })
+
+
+    except Exception as e:
+        trace = traceback.format_exc()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"ERROR AL BUSCAR DATOS: {trace}"
+        )
 
 
 @app.get("/all")
@@ -18,7 +92,7 @@ async def ready_tasks(db: db_dependency):
     try:
         # Lista de modelos y nombres correspondientes
         job_models = [
-            ("count_afip", JobAfip),
+            ("afip", JobAfip),
             ("afccma", JobAfccma),
             ("afsales", JobAfsales),
             ("afddjj", JobAfddjj),
@@ -38,7 +112,7 @@ async def ready_tasks(db: db_dependency):
             tareas[name] = count
             total_count += count  # Acumula el conteo total
 
-        tareas["totals"]= total_count
+        tareas["totals"] = total_count
 
         return {
             #"status": 200,
@@ -47,9 +121,10 @@ async def ready_tasks(db: db_dependency):
         }
 
     except Exception as e:
+        trace = traceback.format_exc()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="ERROR AL BUSCAR DATOS"
+            detail=f"ERROR AL BUSCAR DATOS: {trace}"
         )
 
 
@@ -58,7 +133,7 @@ async def in_queue_tasks(db: db_dependency):
     try:
         # Lista de modelos y nombres correspondientes
         job_models = [
-            ("count_afip", JobAfip),
+            ("afip", JobAfip),
             ("afccma", JobAfccma),
             ("afsales", JobAfsales),
             ("afddjj", JobAfddjj),
@@ -99,7 +174,7 @@ async def get_task_by_id(db: db_dependency, id: str):
     try:
         # Lista de modelos y nombres correspondientes
         job_models = [
-            ("count_afip", JobAfip),
+            ("afip", JobAfip),
             ("afccma", JobAfccma),
             ("afsales", JobAfsales),
             ("afddjj", JobAfddjj),
@@ -137,3 +212,9 @@ async def get_task_by_id(db: db_dependency, id: str):
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="ERROR AL BUSCAR DATOS"
         )
+
+
+
+@app.post("/get_cuit")
+async def get_user_cuit(q: str = Query()):
+    return q

@@ -1,0 +1,4 @@
+[2025-01-22 12:06:38,576] INFO in server: Shutting down (File: /home/ernesto/anaconda3/envs/ts_dashboard/lib/python3.11/site-packages/uvicorn/server.py Line: 262)
+[2025-01-22 12:06:38,677] INFO in on: Waiting for application shutdown. (File: /home/ernesto/anaconda3/envs/ts_dashboard/lib/python3.11/site-packages/uvicorn/lifespan/on.py Line: 67)
+[2025-01-22 12:06:38,677] INFO in on: Application shutdown complete. (File: /home/ernesto/anaconda3/envs/ts_dashboard/lib/python3.11/site-packages/uvicorn/lifespan/on.py Line: 76)
+[2025-01-22 12:06:38,677] INFO in server: Finished server process [8848] (File: /home/ernesto/anaconda3/envs/ts_dashboard/lib/python3.11/site-packages/uvicorn/server.py Line: 92)

@@ -37,9 +37,9 @@ MarkupSafe==3.0.2
 mdurl==0.1.2
 multidict==6.0.5
 narwhals==1.13.2
-numpy==1.26.3
+numpy
 packaging==24.1
-pandas==2.2.3
+pandas
 pillow==11.0.0
 protobuf==5.28.3
 py==1.11.0
