@@ -27,7 +27,8 @@ query = st.text_input("Introduce tu consulta:", placeholder="identificador ...")
 if st.button("Realizar búsqueda"):
     if query:
         # Crear la URL con el query
-        base_url = "http://localhost:8000/get_task"
+        # base_url = "http://localhost:8000/get_task"
+        base_url = "http://localhost:80/get_task"
         full_url = f"{base_url}?id={query}"
 
         # Mostrar la URL generada
