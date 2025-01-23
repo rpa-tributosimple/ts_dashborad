@@ -1,18 +1,21 @@
 import streamlit as st
 import pandas as pd
 import requests
+#
+# DEV = True
+#
+# if not DEV:
+#     # URLs de FastAPI
+#     url_tasks_done = "http://localhost:80/ready"
+#     url_tasks_queues = "http://localhost:80/queue"
+# else:
+#     # URLs de FastAPI
+#     url_tasks_all = "http://localhost:8000/all"
+#     url_tasks_done = "http://localhost:8000/ready"
+#     url_tasks_queues = "http://localhost:8000/queue"
 
-DEV = True
-
-if not DEV:
-    # URLs de FastAPI
-    url_tasks_done = "http://localhost:80/ready"
-    url_tasks_queues = "http://localhost:80/queue"
-else:
-    # URLs de FastAPI
-    url_tasks_all = "http://localhost:8000/all"
-    url_tasks_done = "http://localhost:8000/ready"
-    url_tasks_queues = "http://localhost:8000/queue"
+url_tasks_done = "http://localhost:80/ready"
+url_tasks_queues = "http://localhost:80/queue"
 
 
 
@@ -47,12 +50,6 @@ if st.button("Realizar búsqueda"):
             st.error(f"Error al realizar la consulta: {e}")
     else:
         st.warning("Por favor, introduce un texto para la búsqueda.")
-
-
-
-
-
-
 
 
 
