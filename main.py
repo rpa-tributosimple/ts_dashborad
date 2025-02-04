@@ -9,7 +9,7 @@ from logging_config import setup_logging
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 import pandas as pd
-
+from enum import Enum
 
 setup_logging()
 
@@ -213,6 +213,62 @@ async def get_task_by_id(db: db_dependency, id: str):
             detail="ERROR AL BUSCAR DATOS"
         )
 
+
+class TipoService(str, Enum):
+    afip_get_sales = "get_sales"
+    sales2 = "sales2"
+    get_purchases = "purchases"
+    purchases2 = "purchases2"
+    ccma = "ccma"
+    ccma2 = "ccma2"
+    ddjj = "ddjj"
+    ddjj2 = "ddjj2"
+    get_category = "get_category"
+    alta_monotributo = "alta_monotributo"
+    get_image = "get_image"
+    siper = "siper"
+
+
+@app.get("/get_totals_by")
+async def get_total_tasks_by(db: db_dependency, instancia, servirce: TipoService):
+    count = 0
+    models = [
+                ("afip", JobAfip),
+                ("afccma", JobAfccma),
+                ("afsales", JobAfsales),
+                ("afddjj", JobAfddjj),
+                ("afpurchases", JobAfpurchases),
+                ("afconst", JobAfconst),
+                ("agip", JobAgip),
+                ("arba", JobArba),
+
+        ]
+
+    insta = ["afip", "afccma", "afsales", "afddjj", "afpurchases", "const"]
+
+    if instancia not in insta:
+        raise HTTPException(status_code= status.HTTP_400_BAD_REQUEST,
+                            detail=f"No existe la instancia #### {instancia} ####\n"
+                                   f"instancias disponibles:\n"
+                                   f"afip,\n"
+                                   f"sales,\n"
+                                   f"purchases,\n"
+                                   f"ccma,\n"
+                                   f"ddjj,\n"
+                                   f"const,")
+
+
+    for servicio, tabla in models:
+        if instancia == servicio:
+
+            is_service = db.query(tabla).filter(tabla.service == servirce).first()
+
+            if not is_service:
+                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Service not found in table")
+
+            count = db.query(tabla).filter(tabla.service == servirce).count()
+
+    return count
 
 
 @app.post("/get_cuit")
